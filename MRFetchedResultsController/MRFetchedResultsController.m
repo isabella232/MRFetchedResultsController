@@ -252,7 +252,9 @@ static NSCache *__cache = nil;
 {
     NSParameterAssert(fetchRequest);
     NSParameterAssert(fetchRequest.sortDescriptors.count > 0);
-    NSParameterAssert(sectionNameKeyPath == nil || [[fetchRequest.sortDescriptors.firstObject key] isEqualToString:sectionNameKeyPath]);
+    // With NSFetchedResultsController, the only requirement is that sectionNameKeyPath generate
+    // the same relative orderings as with the sort descriptors.
+//    NSParameterAssert(sectionNameKeyPath == nil || [[fetchRequest.sortDescriptors.firstObject key] isEqualToString:sectionNameKeyPath]);
     NSArray *const sortDescriptors = fetchRequest.sortDescriptors;
     if (sortDescriptors.count == 0) {
         if (sectionNameKeyPath) {
