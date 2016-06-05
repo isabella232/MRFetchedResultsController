@@ -252,23 +252,6 @@ static NSCache *__cache = nil;
 {
     NSParameterAssert(fetchRequest);
     NSParameterAssert(fetchRequest.sortDescriptors.count > 0);
-    // With NSFetchedResultsController, the only requirement is that sectionNameKeyPath generate
-    // the same relative orderings as with the sort descriptors.
-//    NSParameterAssert(sectionNameKeyPath == nil || [[fetchRequest.sortDescriptors.firstObject key] isEqualToString:sectionNameKeyPath]);
-    NSArray *const sortDescriptors = fetchRequest.sortDescriptors;
-    if (sortDescriptors.count == 0) {
-        if (sectionNameKeyPath) {
-            fetchRequest = fetchRequest.copy;
-            fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:sectionNameKeyPath ascending:YES] ];
-        }
-    } else if (sectionNameKeyPath) {
-        NSSortDescriptor *const firstSortDescriptor = sortDescriptors.firstObject;
-        if (![firstSortDescriptor.key isEqual:sectionNameKeyPath]) {
-            NSSortDescriptor *const sectionSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sectionNameKeyPath ascending:YES];
-            fetchRequest = fetchRequest.copy;
-            fetchRequest.sortDescriptors = [sortDescriptors arrayByAddingObject:sectionSortDescriptor];
-        }
-    }
     NSParameterAssert(context);
     if ((self = [self init])) {
         _fetchRequest = fetchRequest;
@@ -549,9 +532,9 @@ static NSCache *__cache = nil;
               , firstObject
               , keyPath);
         currentName = @"";
+    } else if (![currentName isKindOfClass:NSString.class]) {
+        currentName = [currentName description];
     }
-    NSAssert([currentName isKindOfClass:NSString.class]
-             , @"section name should be a string");
     NSUInteger currentLocation = 0;
     NSUInteger currentLength = 0;
     NSMutableArray *const sections = NSMutableArray.array;
@@ -565,9 +548,9 @@ static NSCache *__cache = nil;
                   , firstObject
                   , keyPath);
             objectSectionName = @"";
+        } else if (![objectSectionName isKindOfClass:NSString.class]) {
+            objectSectionName = [objectSectionName description];
         }
-        NSAssert([objectSectionName isKindOfClass:NSString.class]
-                 , @"section name should be a string");
         if ([objectSectionName isEqual:currentName]) {
             currentLength += 1;
         } else {
